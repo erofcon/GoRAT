@@ -6,9 +6,8 @@ import (
 )
 
 type Client struct {
-	name    string
-	command string
-	conn    net.Conn
+	name string
+	conn net.Conn
 }
 
 func (client *Client) clientHandler(list *ClientList) {

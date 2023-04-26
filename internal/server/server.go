@@ -37,8 +37,8 @@ func Server() {
 	go newConnectionHandler(listener, &list)
 
 	for {
-		fmt.Println()
-		fmt.Print(">> ")
+		pterm.Println()
+		pterm.DefaultBasicText.WithStyle(pterm.FgDarkGray.ToStyle()).Print(">> ")
 		_, err := fmt.Scan(&command)
 
 		if err != nil {
@@ -53,26 +53,21 @@ func Server() {
 				continue
 			}
 		} else if command == "list" || command == "ls" {
-			var clients []string
-
-			for i, client := range list.list {
-				clients = append(clients, string(i))
-				clients = append(clients, client.name)
+			pterm.DefaultBasicText.WithStyle(pterm.FgDarkGray.ToStyle()).Println("Waiting ...")
+			render.ConnectionsHeader()
+			if len(list.list) > 0 {
+				for i := 0; i < len(list.list); i++ {
+					pterm.DefaultBasicText.WithStyle(pterm.FgWhite.ToStyle()).Print(fmt.Sprintf("%d \t     | %s\n", i, list.list[i].name))
+					pterm.DefaultBasicText.WithStyle(pterm.FgDarkGray.ToStyle()).Print("_________________________________\n")
+				}
+			} else {
+				pterm.DefaultBasicText.WithStyle(pterm.FgDarkGray.ToStyle()).Println("Connection list is empty")
 			}
-
-			fmt.Println(clients)
 
 		} else {
 			pterm.DefaultBasicText.WithStyle(pterm.FgDarkGray.ToStyle()).Println("Wrong command. input 'h' or 'help' to show commands ")
 		}
 
-		//if command == "list" || command == "ls" {
-		//	fmt.Println(len(list.list))
-		//} else if command == "command" {
-		//	list.list[0].conn.Write([]byte("Hello"))
-		//} else if command == "rm" {
-		//	list.removeClient(list.list[0])
-		//}
 	}
 }
 
