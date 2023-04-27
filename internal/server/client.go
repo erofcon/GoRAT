@@ -6,11 +6,12 @@ import (
 )
 
 type Client struct {
-	name string
-	conn net.Conn
+	name     string
+	conn     net.Conn
+	isActual bool
 }
 
-func (client *Client) clientHandler(list *ClientList) {
+func (client *Client) newClient(list *ClientList) {
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {
@@ -22,7 +23,9 @@ func (client *Client) clientHandler(list *ClientList) {
 	list.addClient(client)
 
 	for {
-		continue
+		if !client.isActual {
+			break
+		}
 	}
 
 }

