@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pterm/pterm"
 	"net"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -89,42 +90,63 @@ func (list *ClientList) clientHandler(index int) {
 				if len(dir) == 2 && dir[0] == "download" {
 					pterm.DefaultBasicText.WithStyle(pterm.FgDarkGray.ToStyle()).Println("Waiting ...")
 
-					//pterm.DefaultBasicText.WithStyle(pterm.FgDarkGray.ToStyle()).Println("Waiting ...")
-					//_, err := client.conn.Write([]byte(result))
-					//if err != nil {
-					//	return
-					//}
-					//file, err := os.Create("test.py")
-					//if err != nil {
-					//	fmt.Println("Unable to create file:", err)
-					//	return
-					//}
+					_, err := client.conn.Write([]byte(result))
+					if err != nil {
+						return
+					}
+
+					buff := make([]byte, 1024)
+
+					n, err := client.conn.Read(buff)
+
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
+					fileSize, _ := strconv.ParseInt(strings.Trim(string(buff[:n]), ":"), 10, 64)
+					fmt.Println("Size ", fileSize)
+
+					n, err = client.conn.Read(buff)
+
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
+					fileName := strings.Trim(string(buff[:n]), ":")
+					fmt.Println("Filename  ", fileName)
+
+					//bufferFileName := make([]byte, 1024)
+					//bufferFileSize := make([]byte, 1024)
+					////
+					//fmt.Println(string(bufferFileSize))
+					//fmt.Println(string(bufferFileName))
+
+					//client.conn.Read(bufferFileSize)
+					//fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
+					//
+					//client.conn.Read(bufferFileName)
+					//fileName := strings.Trim(string(bufferFileName), ":")
+					//
+					//fmt.Println(fileSize)
+					//fmt.Println(fileName)
+
+					//newFile, _ := os.Create(fileName + "_2")
+					//
+					//var receivedBytes int64
+					//
 					//for {
-					//
-					//	buff := make([]byte, 1024)
-					//	n, err := client.conn.Read(buff)
-					//	if n == 0 || err != nil {
-					//		fmt.Println("errrr", err)
+					//	if (fileSize - receivedBytes) < 1024 {
+					//		io.CopyN(newFile, client.conn, (fileSize - receivedBytes))
+					//		client.conn.Read(make([]byte, (receivedBytes+1024)-fileSize))
 					//		break
 					//	}
-					//
-					//	_, err = file.Write(buff)
-					//	if err != nil {
-					//		fmt.Println(err)
-					//		break
-					//	}
-					//	err = client.conn.SetReadDeadline(time.Now().Add(time.Millisecond * 700))
-					//	if err != nil {
-					//		fmt.Println(err)
-					//		break
-					//	}
+					//	io.CopyN(newFile, client.conn, 1024)
+					//	receivedBytes += 1024
 					//}
-					//err = file.Close()
-					//fmt.Println("hi")
-					//if err != nil {
-					//	fmt.Println(err)
-					//	return
-					//}
+					//fmt.Println("Received file completely!")
+					//
+					//newFile.Close()
+
 				}
 			}
 		}

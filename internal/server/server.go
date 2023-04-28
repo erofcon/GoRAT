@@ -22,7 +22,6 @@ func Server() {
 	listener, err := net.Listen("tcp", ":1234")
 
 	var list ClientList
-	//var command string
 
 	if err != nil {
 		fmt.Println(err)
@@ -110,9 +109,9 @@ func getTextFromClient(client *Client, input string) {
 	}
 	for {
 
-		buff := make([]byte, 1024)
+		buff := make([]byte, 5024)
 		n, err := client.conn.Read(buff)
-		if err != nil {
+		if n == 0 || err != nil {
 			break
 		}
 		output += string(buff[:n])

